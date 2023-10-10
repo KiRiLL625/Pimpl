@@ -1,0 +1,45 @@
+//
+// Created by Admin on 19.09.2023.
+//
+
+#include "TimeMeter.h"
+#include "MembersWin.h"
+#include <windows.h>
+
+
+TimeMeter::TimeMeter(unsigned count) : members(new Members(count)) {}
+
+TimeMeter::~TimeMeter() = default;
+
+double TimeMeter::setTimeStamp(unsigned num) {
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER time;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&time);
+    members->timeStamps[num] = time.QuadPart * 1.0 / frequency.QuadPart;
+    return members->timeStamps[num];
+}
+
+double TimeMeter::getSTimeStamp(unsigned num) {
+    return members->timeStamps[num];
+}
+
+int64_t TimeMeter::getMSTimeStamp(unsigned num) {
+    return members->timeStamps[num] / 1000000;
+}
+
+double TimeMeter::getSDiff(unsigned first, unsigned second) {
+    return members->timeStamps[second] - members->timeStamps[first];
+}
+
+int64_t TimeMeter::getMSDiff(unsigned first, unsigned second) {
+    return (members->timeStamps[second] - members->timeStamps[first]) * 1000;
+}
+
+bool TimeMeter::isLess(unsigned first, unsigned second, int64_t expected) {
+    return getMSTimeStamp(second) - getMSTimeStamp(first) < expected;
+}
+
+bool TimeMeter::isLess(unsigned num, int64_t expected) {
+    return getMSTimeStamp(num) < expected;
+}
